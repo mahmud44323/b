@@ -29,7 +29,6 @@ def cartoonize_image(image_path):
 
 @app.route('/')
 def index():
-    # HTML code directly embedded in the response
     return '''
     <!DOCTYPE html>
     <html lang="en">
@@ -104,6 +103,7 @@ def index():
                 margin: 20px 0;
                 border-radius: 10px;
                 background-color: #ffffff;
+                display: none;  /* Hide by default */
             }
             .image-preview-box img {
                 max-width: 100%;
@@ -119,7 +119,7 @@ def index():
         <div class="content">
             <h1>Make this Photo to Cartoon</h1>
             <p>100% Automatically and <span class="highlight">Free</span></p>
-            <form method="POST" action="/upload" enctype="multipart/form-data">
+            <form id="uploadForm">
                 <input type="file" name="image" accept="image/*" required>
                 <button type="submit" class="upload-button">Upload Image</button>
             </form>
@@ -131,11 +131,32 @@ def index():
                 <img alt="Sample image 4" src="https://storage.googleapis.com/a1aa/image/F1xUAyM9Rho3PRRF34Q8ZAGA4VqgLGi5T6Z9qD9z38GXeKzJA.jpg" />
             </div>
             <div class="image-preview-box" id="imagePreview">
-                <img alt="Image preview" id="previewImage" src="" style="display:none;" />
+                <img alt="Image preview" id="previewImage" src="" />
             </div>
         </div>
         <script>
-            // Optional JavaScript to handle image preview (if needed)
+            document.getElementById('uploadForm').addEventListener('submit', function(event) {
+                event.preventDefault();  // Prevent form submission
+
+                let formData = new FormData(this);
+                fetch('/upload', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.cartoon_image) {
+                        // Display the cartoonized image
+                        document.getElementById('previewImage').src = data.cartoon_image;
+                        document.getElementById('imagePreview').style.display = 'block';  // Show the preview box
+                    } else {
+                        alert('Image processing failed. Please try again.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            });
         </script>
     </body>
     </html>
