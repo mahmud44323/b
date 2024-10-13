@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, send_from_directory, render_template
+from flask import Flask, request, jsonify
 import cv2
 import numpy as np
 import os
@@ -29,7 +29,117 @@ def cartoonize_image(image_path):
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    # HTML code directly embedded in the response
+    return '''
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Make this Photo to Cartoon</title>
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                text-align: center;
+                margin: 0;
+                padding: 0;
+                background-color: #f8f9fa;
+            }
+            .header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 10px 20px;
+                background-color: #ffffff;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            }
+            .header img {
+                height: 40px;
+            }
+            .header .menu-icon {
+                font-size: 24px;
+            }
+            .content {
+                padding: 20px;
+            }
+            .content h1 {
+                font-size: 24px;
+                font-weight: bold;
+                margin: 20px 0;
+            }
+            .content p {
+                font-size: 18px;
+                margin: 10px 0;
+            }
+            .content .highlight {
+                background-color: #ffeb3b;
+                padding: 2px 6px;
+                border-radius: 4px;
+            }
+            .upload-button {
+                display: inline-block;
+                background-color: #007bff;
+                color: #ffffff;
+                padding: 15px 30px;
+                font-size: 18px;
+                border-radius: 25px;
+                text-decoration: none;
+                margin: 20px 0;
+            }
+            .image-suggestions {
+                display: flex;
+                justify-content: center;
+                gap: 10px;
+                margin: 20px 0;
+            }
+            .image-suggestions img {
+                width: 60px;
+                height: 60px;
+                border-radius: 8px;
+            }
+            .image-preview-box {
+                border: 2px dashed #007bff;
+                padding: 20px;
+                margin: 20px 0;
+                border-radius: 10px;
+                background-color: #ffffff;
+            }
+            .image-preview-box img {
+                max-width: 100%;
+                border-radius: 10px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="header">
+            <img alt="Logo" height="40" src="https://storage.googleapis.com/a1aa/image/3lS5IXarPqIzKldK5eq9Yse0sz3McK2QqYdsJvlMR4yb5VmTA.jpg" width="40"/>
+            <i class="fas fa-bars menu-icon"></i>
+        </div>
+        <div class="content">
+            <h1>Make this Photo to Cartoon</h1>
+            <p>100% Automatically and <span class="highlight">Free</span></p>
+            <form method="POST" action="/upload" enctype="multipart/form-data">
+                <input type="file" name="image" accept="image/*" required>
+                <button type="submit" class="upload-button">Upload Image</button>
+            </form>
+            <p>No image? Try one of these:</p>
+            <div class="image-suggestions">
+                <img alt="Sample image 1" src="https://storage.googleapis.com/a1aa/image/ViCvG3CefrnQp0cyn34yozLy9qVaZ4stFIIYCbRhSbwY5VmTA.jpg" />
+                <img alt="Sample image 2" src="https://storage.googleapis.com/a1aa/image/kXnhaYEh0mqLBZc22O6n8pa2uv7i7AeAEDtfGwubnPMa5VmTA.jpg" />
+                <img alt="Sample image 3" src="https://storage.googleapis.com/a1aa/image/fN8dtVsyMRytRyPBnTgrkVHq44GL4xHIBziwuXEzPkav8KzJA.jpg" />
+                <img alt="Sample image 4" src="https://storage.googleapis.com/a1aa/image/F1xUAyM9Rho3PRRF34Q8ZAGA4VqgLGi5T6Z9qD9z38GXeKzJA.jpg" />
+            </div>
+            <div class="image-preview-box" id="imagePreview">
+                <img alt="Image preview" id="previewImage" src="" style="display:none;" />
+            </div>
+        </div>
+        <script>
+            // Optional JavaScript to handle image preview (if needed)
+        </script>
+    </body>
+    </html>
+    '''
 
 @app.route('/upload', methods=['POST'])
 def upload_image():
